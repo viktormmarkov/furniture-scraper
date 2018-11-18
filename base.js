@@ -2,24 +2,44 @@ const _ = require('lodash');
 const xray = require('x-ray');
 const x = xray();
 
-const providers = [{
-    name: 'Videnov',
-    url: 'https://videnov.bg/',
-    baseUrl: 'https://videnov.bg/products',
-    products: [{
-        category: 'Kitchen',
-        url: 'standartni-kuhni',
-        schema: {
-            base: '.prod-teaser',
-            details: [{
-                title: '.prod-teaser-title a',
-                image: '.prod-teaser-image img@src',
-                price: '.prod-teaser-price',
-                url: '.prod-teaser-title a@href',
-            }]
-        }
-    }]
-}]
+const providers = [
+    //     {
+    //     name: 'Videnov',
+    //     url: 'https://videnov.bg/',
+    //     baseUrl: 'https://videnov.bg/products',
+    //     products: [{
+    //         category: 'Kitchen',
+    //         url: 'standartni-kuhni',
+    //         schema: {
+    //             base: '.prod-teaser',
+    //             details: [{
+    //                 title: '.prod-teaser-title a',
+    //                 image: '.prod-teaser-image img@src',
+    //                 price: '.prod-teaser-price',
+    //                 url: '.prod-teaser-title a@href',
+    //             }]
+    //         }
+    //     }]
+    // },
+    {
+        name: 'Mondo',
+        url: 'https://mondomebeli.com/',
+        baseUrl: 'https://mondomebeli.com/kuhni/',
+        products: [{
+            category: 'Kitchen',
+            url: 'kuhnenski-komplekti',
+            schema: {
+                base: '.item.normal',
+                details: [{
+                    title: '.image-wrapper img@alt',
+                    image: '.image-wrapper img@src',
+                    price: '.price',
+                    url: 'image.img-redirect@data-url',
+                }]
+            }
+        }]
+    }
+]
 
 _.each(providers, provider => {
     _.each(provider.products, product => {
