@@ -19,7 +19,8 @@ const providers = [
     //                 url: '.prod-teaser-title a@href',
     //             }]
     //         }
-    //     }]
+    //     }],
+    //     nextPageSelector: ''
     // },
     {
         name: 'Mondo',
@@ -33,11 +34,12 @@ const providers = [
                 details: [{
                     title: '.image-wrapper img@alt',
                     image: '.image-wrapper img@src',
-                    price: '.price',
-                    url: 'image.img-redirect@data-url',
+                    price: '.price-wrapper .price span[itemprop="price"]',
+                    url: '.image.img-redirect@data-url',
                 }]
             }
-        }]
+        }],
+        nextPageSelector: '.pagination li:last-child a@href'
     }
 ]
 
@@ -45,11 +47,14 @@ _.each(providers, provider => {
     _.each(provider.products, product => {
         x(`${provider.baseUrl}/${product.url}`, {
             items: x(product.schema.base, product.schema.details)
-        })((err, result) => {
+        })
+        .paginate(provider.nextPageSelector)
+        .limit(1)
+        ((err, result) => {
             if (err) {
                 console.log(err);
             } else {
-                console.log(result);
+                console.log(results);
             }
         });
     })
