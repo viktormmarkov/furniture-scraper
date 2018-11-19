@@ -54,7 +54,7 @@ _.each(providers, provider => {
             if (err) {
                 console.log(err);
             } else {
-                console.log(results);
+                console.log(result);
             }
         });
     })
