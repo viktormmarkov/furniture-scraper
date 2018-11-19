@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/viktormmarkov/furniture-scraper#readme",
   "dependencies": {
+    "get-image-colors": "^1.8.1",
     "lodash": "^4.17.11",
     "x-ray": "^2.3.3"
   }

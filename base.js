@@ -55,7 +55,7 @@ function download(product, provider) {
     } = product || {};
     const largeImageUrl = provider.largeImageUrl(uri);
     request.head(largeImageUrl, function (err, res, body) {
-        request(largeImageUrl).pipe(fs.createWriteStream(`imgs/${filename}`));
+        request(largeImageUrl).pipe(fs.createWriteStream(`imgs/${filename}.jpg`));
     });
 }
 
