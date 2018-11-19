@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const xray = require('x-ray');
 const x = xray();
+const fs = require('fs');
+const request = require('request');
 
 const providers = [
     //     {
@@ -39,24 +41,37 @@ const providers = [
                 }]
             }
         }],
-        nextPageSelector: '.pagination li:last-child a@href'
+        nextPageSelector: '.pagination li:last-child a@href',
+        largeImageUrl: (smallImageUrl) => {
+            return _.replace(smallImageUrl, '301', '1200');
+        }
     }
-]
+];
+
+function download(product, provider) {
+    const {
+        image: uri,
+        title: filename
+    } = product || {};
+    const largeImageUrl = provider.largeImageUrl(uri);
+    request.head(largeImageUrl, function (err, res, body) {
+        request(largeImageUrl).pipe(fs.createWriteStream(`imgs/${filename}`));
+    });
+}
 
 _.each(providers, provider => {
     _.each(provider.products, product => {
         x(`${provider.baseUrl}/${product.url}`, {
-            items: x(product.schema.base, product.schema.details)
-        })
-        .paginate(provider.nextPageSelector)
-        .limit(1)
-        ((err, result) => {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(result);
-            }
-        });
+                items: x(product.schema.base, product.schema.details)
+            })
+            .paginate(provider.nextPageSelector)
+            .limit(1)
+            ((err, [products]) => {
+                if (err) {
+                } else {
+                    _.map(products.items, p => download(p, provider));
+                }
+            });
     })
 });
 
