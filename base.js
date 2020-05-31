@@ -1,81 +1,58 @@
 const _ = require('lodash');
 const xray = require('x-ray');
 const x = xray();
-const fs = require('fs');
+// const fs = require('fs');
 const request = require('request');
+const matcher = require('./matcher');
 
-const providers = [
-    //     {
-    //     name: 'Videnov',
-    //     url: 'https://videnov.bg/',
-    //     baseUrl: 'https://videnov.bg/products',
-    //     products: [{
-    //         category: 'Kitchen',
-    //         url: 'standartni-kuhni',
-    //         schema: {
-    //             base: '.prod-teaser',
-    //             details: [{
-    //                 title: '.prod-teaser-title a',
-    //                 image: '.prod-teaser-image img@src',
-    //                 price: '.prod-teaser-price',
-    //                 url: '.prod-teaser-title a@href',
-    //             }]
-    //         }
-    //     }],
-    //     nextPageSelector: ''
-    // },
+const apiBase = 'http://localhost:3031';
+const promotionsApi = `${apiBase}/promotions`;
+
+const shops = [
     {
-        name: 'Mondo',
-        url: 'https://mondomebeli.com/',
-        baseUrl: 'https://mondomebeli.com/kuhni/',
-        products: [{
-            category: 'Kitchen',
-            url: 'kuhnenski-komplekti',
-            schema: {
-                base: '.item.normal',
-                details: [{
-                    title: '.image-wrapper img@alt',
-                    image: '.image-wrapper img@src',
-                    price: '.price-wrapper .price span[itemprop="price"]',
-                    url: '.image.img-redirect@data-url',
-                }]
-            }
+        name: 'Kaulfand',
+        url: 'https://www.kaufland.bg/',
+        baseUrl: 'https://www.kaufland.bg/aktualni-predlozheniya',
+        schema: {
+            base: '.m-offer-tile__link',
+            details: [{
+                name: '.m-offer-tile__container .m-offer-tile__text .m-offer-tile__title',
+                price: '.m-offer-tile__split .a-pricetag__price',
+                subtitle: '.m-offer-tile__container .m-offer-tile__text .m-offer-tile__subtitle',
+                oldPrice: '.m-offer-tile__split .a-pricetag__old-price'
+            }]
+        },
+        categories: [
+        // {
+        //     name: 'Meat&Fish',
+        //     url: 'ot-ponedelnik.category=01_%D0%9C%D0%B5%D1%81%D0%BE__%D0%BF%D1%82%D0%B8%D1%87%D0%B5_%D0%BC%D0%B5%D1%81%D0%BE__%D0%BA%D0%BE%D0%BB%D0%B1%D0%B0%D1%81%D0%B8.html',
+        // }, {
+        {
+            name: 'Fish',
+            url: 'ot-ponedelnik.category=01a_%D0%9F%D1%80%D1%8F%D1%81%D0%BD%D0%B0_%D1%80%D0%B8%D0%B1%D0%B0.html'
         }],
-        nextPageSelector: '.pagination li:last-child a@href',
-        largeImageUrl: (smallImageUrl) => {
-            return _.replace(smallImageUrl, '301', '1200');
-        }
-    }
-];
+        nextPageSelector: ''
+    },
+]
 
-function download(product, provider) {
-    const {
-        image: uri,
-        title: filename
-    } = product || {};
-    const largeImageUrl = provider.largeImageUrl(uri);
-    request.head(largeImageUrl, function (err, res, body) {
-        request(largeImageUrl).pipe(fs.createWriteStream(`imgs/${filename}.jpg`));
-    });
-}
-
-_.each(providers, provider => {
-    _.each(provider.products, product => {
-        x(`${provider.baseUrl}/${product.url}`, {
-                items: x(product.schema.base, product.schema.details)
-            })
-            .paginate(provider.nextPageSelector)
-            .limit(1)
-            ((err, [products]) => {
-                if (err) {
-                } else {
-                    _.map(products.items, p => download(p, provider));
-                }
-            });
+_.each(shops, provider => {
+    _.each(provider.categories, async category => {
+        x(`${provider.baseUrl}/${category.url}`, {
+            items: x(provider.schema.base, provider.schema.details)
+        })
+        ((err, res) => {
+            if (err) {
+            } else {
+                console.log(category.name)
+                const items = res.items.map(i => ({...i, category: category.name}));
+                const parsed = matcher.parseData(items);
+                // request.post(promotionsApi, {
+                //     json: parsed
+                // }).on('response', function(response) {
+                //     console.log(response.statusCode) // 200
+                // })
+                // console.log(parsed);
+            }
+        });
     })
 });
-
-// persist data in mongo 
-// analyze images -- extract main colorss
-// invalidate data in mongo
-// persist provider in data and allow it to be modifiable
