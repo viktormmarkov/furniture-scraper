@@ -7,8 +7,8 @@ const clearWords = [
     'от витрина с обслужване'
 ];
 
-function prepareData(item) {
-    const trimmed = _(item)
+function prepareData(raw) {
+    const trimmed = _(raw)
         .mapValues(i => i.trim())
         .value();
     const name = trimmed.name && _.reduce(clearWords, (res, item) => res.replace(item, ''), trimmed.name);
@@ -19,7 +19,8 @@ function prepareData(item) {
     const parsed = {
         ...cleared, 
         price: parseFloat(trimmed.price.replace(',', '.')),
-        oldPrice: parseFloat(trimmed.oldPrice.replace(',', '.'))
+        oldPrice: parseFloat(trimmed.oldPrice.replace(',', '.')),
+        raw: cleared
     }
     return parsed;
 }
