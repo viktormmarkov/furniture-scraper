@@ -1,7 +1,12 @@
  const k = {
+    _id: '5ed8f4a81f91217983c56781',
     name: 'Kaulfand',
     url: 'https://www.kaufland.bg/',
     baseUrl: 'https://www.kaufland.bg/aktualni-predlozheniya',
+    dates: {
+        url:  'https://www.kaufland.bg/aktualni-predlozheniya/ot-ponedelnik.html',
+        selector: '.a-icon-tile-headline__subheadline'
+    },
     schema: {
         base: '.m-offer-tile__link',
         details: [{
@@ -11,8 +16,7 @@
             oldPrice: '.m-offer-tile__split .a-pricetag__old-price'
         }]
     },
-    categories: [
-    {
+    categories: [{
         name: 'Meat&Fish',
         url: 'ot-ponedelnik.category=01_%D0%9C%D0%B5%D1%81%D0%BE__%D0%BF%D1%82%D0%B8%D1%87%D0%B5_%D0%BC%D0%B5%D1%81%D0%BE__%D0%BA%D0%BE%D0%BB%D0%B1%D0%B0%D1%81%D0%B8.html',
     }, {
